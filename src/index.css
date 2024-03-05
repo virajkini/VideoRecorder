@@ -18,12 +18,13 @@ code {
 }
 
 h1 {
-  align-content: center;
+  text-align: center;
 }
 
 
 button {
   border: 0;
+  margin-right: 8px;
   outline: 0;
   cursor: pointer;
   color: rgb(60, 66, 87);

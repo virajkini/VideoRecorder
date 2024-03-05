@@ -12,7 +12,7 @@ export default function Recorder({
 }) {
   return (
     <React.Fragment>
-      <video ref={videoRef} width="400" height="300" autoPlay></video>
+      <video ref={videoRef} width="400" height="300" autoPlay muted></video>
       
       <div>
         {isRecording ? (

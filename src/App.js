@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import RecordList from "./components/recordList";
 import Recorder from "./components/recorder";
-import { muteSpeaker, unmuteSpeaker } from "./utils/videoUtils";
 
 function App() {
   const [recording, setRecording] = useState(false);
@@ -12,7 +11,6 @@ function App() {
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const recordedTimeRef = useRef(0);
-  const startTimeRef = useRef(null);
 
   useEffect(() => {
     startCamera();
@@ -20,12 +18,17 @@ function App() {
 
   useEffect(() => {
     if (recording && !paused) {
+      let timeTaken =  recordedTime + 1;
       const intervalId = setInterval(() => {
-        const timeTaken = Math.floor(
-          (Date.now() - startTimeRef.current) / 1000
-        );
+        timeTaken++;
         setRecordedTime(timeTaken);
         recordedTimeRef.current = timeTaken;
+
+        // Stop recording if exeeds threshold
+        if(timeTaken > 60) {
+            stopRecording()
+            alert('Recording on for long time. Hence stopped and saved for download');
+        }
       }, 1000);
 
       return () => clearInterval(intervalId);
@@ -37,7 +40,6 @@ function App() {
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
         videoRef.current.srcObject = stream;
-        muteSpeaker(videoRef);
       })
       .catch((_error) => {
         alert("Permission Denied");
@@ -46,11 +48,9 @@ function App() {
 
   const startRecording = () => {
     setRecording(true);
-    unmuteSpeaker(videoRef);
     setPaused(false);
 
     chunksRef.current = [];
-    startTimeRef.current = Date.now();
 
     const stream = videoRef.current.srcObject;
     mediaRecorderRef.current = new MediaRecorder(stream);
@@ -78,17 +78,13 @@ function App() {
   const stopRecording = () => {
     mediaRecorderRef.current.stop();
     setRecording(false);
-
-    muteSpeaker(videoRef);
     setRecordedTime(0);
   };
 
   const pauseRecording = () => {
     if (!paused) {
-      muteSpeaker(videoRef);
       mediaRecorderRef.current.pause();
     } else {
-      unmuteSpeaker(videoRef);
       mediaRecorderRef.current.resume();
     }
     setPaused(!paused);
