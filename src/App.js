@@ -41,9 +41,7 @@ function App() {
       .then((stream) => {
         videoRef.current.srcObject = stream;
       })
-      .catch((_error) => {
-        alert("Permission Denied");
-      });
+      
   };
 
   const startRecording = () => {
